@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 
 // utils
-import { stageToStatusMap } from '@/lib/utils';
+import { stageToStatusMap, titleCase } from '@/lib/utils';
 import {
   BACKGROUND_FIELDS,
   WEBSITE_FIELDS,
@@ -69,6 +69,11 @@ function transformRow(row: InputRow, headers: string[]): OutputRow | null {
     output['Status'] = stageToStatusMap((row['Stage'] || '').trim());
   }
 
+  if ('Phone 1' in row) {
+    const phoneType = titleCase((row['Phone 1 Type'] || '').trim());
+    output[`${phoneType} Phone`] = (row['Phone 1'] || '').trim();
+  }
+
   // if ('Lead Source' in row) {
   //   output['Source'] = (row['Lead Source'] || '').trim();
   // }
@@ -88,14 +93,6 @@ function transformRow(row: InputRow, headers: string[]): OutputRow | null {
   if ('Texts' in row) {
     output['Texts'] = (row['Texts'] || '').trim();
   }
-
-  // if ('Email 1' in row) {
-  //   output['Email'] = (row['Email 1'] || '').trim();
-  // }
-
-  // if ('Email 1 - Type' in row) {
-  //   output[''] = (row['Email 1 - Type'] || '').trim();
-  // }
 
   if (
     'Address 1 - City' in row ||
@@ -129,9 +126,9 @@ function transformRow(row: InputRow, headers: string[]): OutputRow | null {
     output['Note'] = (row['Notes'] || '').trim();
   }
 
-  if ('Anniversary' in row) {
-    output['Important Occasion'] = (row['Anniversary'] || '').trim();
-  }
+  // if ('Anniversary' in row) {
+  //   output['Important Occasion'] = (row['Anniversary'] || '').trim();
+  // }
 
   if ('Birthday' in row) {
     output['Birthday'] = (row['Birthday'] || '').trim();
