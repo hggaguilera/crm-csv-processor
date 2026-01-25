@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 
 // utils
-import { stageToStatusMap, titleCase } from '@/lib/utils';
+import { stageToStatusMap, formatShortUSDate } from '@/lib/utils';
 import {
   BACKGROUND_FIELDS,
   WEBSITE_FIELDS,
@@ -130,11 +130,15 @@ function transformRow(row: InputRow, headers: string[]): OutputRow | null {
   // }
 
   if ('Birthday' in row) {
-    output['Birthday'] = (row['Birthday'] || '').trim();
+    const formattedBirthday = formatShortUSDate((row['Birthday'] || '').trim());
+    output['Birthday'] = formattedBirthday;
   }
 
   if ('Deal Close Date' in row) {
-    output['Home Anniversary'] = (row['Deal Close Date'] || '').trim();
+    const formattedHomeAnniversary = formatShortUSDate(
+      (row['Deal Close Date'] || '').trim(),
+    );
+    output['Home Anniversary'] = formattedHomeAnniversary;
   }
 
   // Background fields concatenation
