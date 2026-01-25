@@ -70,8 +70,7 @@ function transformRow(row: InputRow, headers: string[]): OutputRow | null {
   }
 
   if ('Phone 1' in row) {
-    const phoneType = titleCase((row['Phone 1 Type'] || '').trim());
-    output[`${phoneType} Phone`] = (row['Phone 1'] || '').trim();
+    output['Phone'] = (row['Phone 1'] || '').trim();
   }
 
   // if ('Lead Source' in row) {
