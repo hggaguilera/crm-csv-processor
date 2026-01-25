@@ -125,12 +125,17 @@ function transformRow(row: InputRow, headers: string[]): OutputRow | null {
     output['Note'] = (row['Notes'] || '').trim();
   }
 
-  // if ('Anniversary' in row) {
-  //   output['Important Occasion'] = (row['Anniversary'] || '').trim();
-  // }
+  if ('Anniversary' in row) {
+    const formattedAnniversary = formatShortUSDate(
+      (row['Anniversary'] || '').trim(),
+    );
+    console.log('formattedAnniversary', formattedAnniversary);
+    output['Wedding Anniversary'] = formattedAnniversary;
+  }
 
   if ('Birthday' in row) {
     const formattedBirthday = formatShortUSDate((row['Birthday'] || '').trim());
+    console.log('formattedBirthday', formattedBirthday);
     output['Birthday'] = formattedBirthday;
   }
 
@@ -138,6 +143,7 @@ function transformRow(row: InputRow, headers: string[]): OutputRow | null {
     const formattedHomeAnniversary = formatShortUSDate(
       (row['Deal Close Date'] || '').trim(),
     );
+    console.log('formattedHomeAnniversary', formattedHomeAnniversary);
     output['Home Anniversary'] = formattedHomeAnniversary;
   }
 
@@ -163,7 +169,7 @@ function transformRow(row: InputRow, headers: string[]): OutputRow | null {
     const rawValue = row[field.key];
 
     if (rawValue && rawValue.trim() !== '') {
-      websiteLines.push(`${field.label}: ${rawValue.trim()}`);
+      websiteLines.push(rawValue.trim());
     }
   }
 
@@ -173,18 +179,12 @@ function transformRow(row: InputRow, headers: string[]): OutputRow | null {
 
   // Email fields concatenation
   const emailLines: string[] = [];
-  const emailTypesLines: string[] = [];
 
   for (const field of EMAIL_FIELDS) {
     const emailValue = row[field.key];
-    const typeValue = row[field.label];
 
     if (emailValue && emailValue.trim() !== '') {
       emailLines.push(emailValue.trim());
-    }
-
-    if (typeValue && typeValue.trim() !== '') {
-      emailTypesLines.push(typeValue.trim());
     }
   }
 
