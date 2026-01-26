@@ -39,7 +39,6 @@ export function formatShortUSDate(value: string): string {
   // if (!matchShortFormat || !matchLongFormat) return '';
 
   if (matchShortFormat) {
-    console.log('here');
     let [, month, day, year] = matchShortFormat;
     // Pad month/day
     month = month.padStart(2, '0');
