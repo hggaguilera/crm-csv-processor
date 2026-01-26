@@ -45,53 +45,42 @@ interface OutputRow {
  * - Concatenates city + state + zip into fullAddress
  * - Preserves email as-is
  */
-function transformRow(row: InputRow, headers: string[]): OutputRow | null {
+function transformRow(row: InputRow, headers: string[]): OutputRow[] {
+  const results: OutputRow[] = [];
   // Skip empty rows (all values are empty or whitespace)
   const hasContent = Object.values(row).some((val) => val && val.trim() !== '');
-  if (!hasContent) return null;
+  if (!hasContent) return results;
 
-  const output: OutputRow = {};
-
-  // if ('Date Added' in row) {
-  //   output['Date Created'] = (row['Date Added'] || '').trim();
-  // }
+  const mainContact: OutputRow = {};
 
   if ('Name' in row) {
-    output['Full Name'] = (row['Name'] || '').trim();
+    mainContact['Full Name'] = (row['Name'] || '').trim();
   }
 
   if ('First Name' in row || 'Last Name' in row) {
-    output['First Name'] = (row['First Name'] || '').trim();
-    output['Last Name'] = (row['Last Name'] || '').trim();
+    mainContact['First Name'] = (row['First Name'] || '').trim();
+    mainContact['Last Name'] = (row['Last Name'] || '').trim();
   }
 
   if ('Stage' in row) {
-    output['Status'] = stageToStatusMap((row['Stage'] || '').trim());
+    mainContact['Status'] = stageToStatusMap((row['Stage'] || '').trim());
   }
 
   if ('Phone 1' in row) {
-    output['Phone'] = (row['Phone 1'] || '').trim();
+    mainContact['Phone'] = (row['Phone 1'] || '').trim();
   }
-
-  // if ('Lead Source' in row) {
-  //   output['Source'] = (row['Lead Source'] || '').trim();
-  // }
-
-  // if ('Assigned To' in row) {
-  //   output['Assigned Agent'] = (row['Assigned To'] || '').trim();
-  // }
 
   if ('Tags' in row) {
-    output['Tags'] = (row['Tags'] || '').trim();
+    mainContact['Tags'] = (row['Tags'] || '').trim();
   }
 
-  if ('Calls' in row) {
-    output['Calls'] = (row['Calls'] || '').trim();
-  }
+  // if ('Calls' in row) {
+  //   mainContact['Calls'] = (row['Calls'] || '').trim();
+  // }
 
-  if ('Texts' in row) {
-    output['Texts'] = (row['Texts'] || '').trim();
-  }
+  // if ('Texts' in row) {
+  //   mainContact['Texts'] = (row['Texts'] || '').trim();
+  // }
 
   if (
     'Address 1 - City' in row ||
@@ -100,11 +89,15 @@ function transformRow(row: InputRow, headers: string[]): OutputRow | null {
     'Address 1 - State' in row ||
     'Address 1 - Zip' in row
   ) {
-    output['Home Address City'] = (row['Address 1 - City'] || '').trim();
-    output['Home Address Country'] = (row['Address 1 - Country'] || '').trim();
-    output['Home Address Line 1'] = (row['Address 1 - Street'] || '').trim();
-    output['Home Address State'] = (row['Address 1 - State'] || '').trim();
-    output['Home Address Zip'] = (row['Address 1 - Zip'] || '').trim();
+    mainContact['Home Address City'] = (row['Address 1 - City'] || '').trim();
+    mainContact['Home Address Country'] = (
+      row['Address 1 - Country'] || ''
+    ).trim();
+    mainContact['Home Address Line 1'] = (
+      row['Address 1 - Street'] || ''
+    ).trim();
+    mainContact['Home Address State'] = (row['Address 1 - State'] || '').trim();
+    mainContact['Home Address Zip'] = (row['Address 1 - Zip'] || '').trim();
   }
 
   if (
@@ -114,37 +107,42 @@ function transformRow(row: InputRow, headers: string[]): OutputRow | null {
     'Address 2 - State' in row ||
     'Address 2 - Zip' in row
   ) {
-    output['Work Address City'] = (row['Address 2 - City'] || '').trim();
-    output['Work Address Country'] = (row['Address 2 - Country'] || '').trim();
-    output['Work Address Line 1'] = (row['Address 2 - Street'] || '').trim();
-    output['Work Address State'] = (row['Address 2 - State'] || '').trim();
-    output['Work Address Zip'] = (row['Address 2 - Zip'] || '').trim();
+    mainContact['Work Address City'] = (row['Address 2 - City'] || '').trim();
+    mainContact['Work Address Country'] = (
+      row['Address 2 - Country'] || ''
+    ).trim();
+    mainContact['Work Address Line 1'] = (
+      row['Address 2 - Street'] || ''
+    ).trim();
+    mainContact['Work Address State'] = (row['Address 2 - State'] || '').trim();
+    mainContact['Work Address Zip'] = (row['Address 2 - Zip'] || '').trim();
   }
 
   if ('Notes' in row) {
-    output['Note'] = (row['Notes'] || '').trim();
+    mainContact['Note'] = (row['Notes'] || '').trim();
   }
 
   if ('Anniversary' in row) {
-    const formattedAnniversary = formatShortUSDate(
-      (row['Anniversary'] || '').trim(),
-    );
-    console.log('formattedAnniversary', formattedAnniversary);
-    output['Wedding Anniversary'] = formattedAnniversary;
+    const formattedAnniversary = formatShortUSDate(row['Anniversary']);
+    mainContact['Wedding Anniversary'] = formattedAnniversary;
   }
 
   if ('Birthday' in row) {
-    const formattedBirthday = formatShortUSDate((row['Birthday'] || '').trim());
-    console.log('formattedBirthday', formattedBirthday);
-    output['Birthday'] = formattedBirthday;
+    const formattedBirthday = formatShortUSDate(row['Birthday']);
+    mainContact['Birthday'] = formattedBirthday;
   }
 
   if ('Deal Close Date' in row) {
-    const formattedHomeAnniversary = formatShortUSDate(
-      (row['Deal Close Date'] || '').trim(),
-    );
-    console.log('formattedHomeAnniversary', formattedHomeAnniversary);
-    output['Home Anniversary'] = formattedHomeAnniversary;
+    const formattedHomeAnniversary = formatShortUSDate(row['Deal Close Date']);
+    mainContact['Home Anniversary'] = formattedHomeAnniversary;
+  }
+
+  if ('Website' in row) {
+    mainContact['Website'] = (row['Website'] || '').trim();
+  }
+
+  if ('Email 1' in row) {
+    mainContact['Email'] = (row['Email 1'] || '').trim();
   }
 
   // Background fields concatenation
@@ -159,40 +157,46 @@ function transformRow(row: InputRow, headers: string[]): OutputRow | null {
   }
 
   if (backgroundLines.length > 0) {
-    output['Key Background Info'] = backgroundLines.join('\n');
+    mainContact['Key Background Info'] = backgroundLines.join('\n');
   }
 
-  // Website fields concatenation
-  const websiteLines: string[] = [];
+  results.push(mainContact);
 
-  for (const field of WEBSITE_FIELDS) {
-    const rawValue = row[field.key];
+  const relationshipFirstName = (row['Relationship 1 First Name'] || '').trim();
+  const relationshipLastName = (row['Relationship 1 Last Name'] || '').trim();
+  const relationshipEmail = (row['Relationship 1 Email 1'] || '').trim();
+  const relationshipPhone = (row['Relationship 1 Phone 1'] || '').trim();
 
-    if (rawValue && rawValue.trim() !== '') {
-      websiteLines.push(rawValue.trim());
+  const hasRelationship =
+    relationshipFirstName ||
+    relationshipLastName ||
+    relationshipEmail ||
+    relationshipPhone;
+
+  if (hasRelationship) {
+    const relationshipContact: OutputRow = {};
+
+    if (relationshipFirstName)
+      relationshipContact['First Name'] = relationshipFirstName;
+    if (relationshipLastName)
+      relationshipContact['Last Name'] = relationshipLastName;
+
+    if (relationshipFirstName || relationshipLastName) {
+      relationshipContact['Full Name'] = [
+        relationshipFirstName,
+        relationshipLastName,
+      ]
+        .filter(Boolean)
+        .join(' ');
     }
+
+    if (relationshipEmail) relationshipContact['Email'] = relationshipEmail;
+    if (relationshipPhone) relationshipContact['Phone'] = relationshipPhone;
+
+    results.push(relationshipContact);
   }
 
-  if (websiteLines.length > 0) {
-    output['Website'] = websiteLines.join('\n');
-  }
-
-  // Email fields concatenation
-  const emailLines: string[] = [];
-
-  for (const field of EMAIL_FIELDS) {
-    const emailValue = row[field.key];
-
-    if (emailValue && emailValue.trim() !== '') {
-      emailLines.push(emailValue.trim());
-    }
-  }
-
-  if (emailLines.length > 0) {
-    output['Email'] = emailLines.join(', ');
-  }
-
-  return output;
+  return results;
 }
 
 export function CsvProcessor() {
@@ -261,9 +265,10 @@ export function CsvProcessor() {
       return;
     }
 
-    const transformed = parsedData
-      .map((row) => transformRow(row, headers))
-      .filter((row): row is OutputRow => row !== null);
+    const transformed = parsedData.flatMap((row) => transformRow(row, headers));
+    // const transformed = parsedData
+    //   .map((row) => transformRow(row, headers))
+    //   .filter((row): row is OutputRow => row !== null);
 
     setProcessedData(transformed);
     setIsProcessed(true);

@@ -33,17 +33,31 @@ export function formatShortUSDate(value: string): string {
   const trimmed = value.trim();
   if (!trimmed) return '';
 
-  const match = trimmed.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2})$/);
-  if (!match) return '';
+  const matchShortFormat = trimmed.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2})$/);
+  const matchLongFormat = trimmed.match(/^(\d{4})\-(\d{1,2})\-(\d{1,2})$/);
+  // console.log('Date match result:', match);
+  // if (!matchShortFormat || !matchLongFormat) return '';
 
-  let [, month, day, year] = match;
+  if (matchShortFormat) {
+    console.log('here');
+    let [, month, day, year] = matchShortFormat;
+    // Pad month/day
+    month = month.padStart(2, '0');
+    day = day.padStart(2, '0');
 
-  // Pad month/day
-  month = month.padStart(2, '0');
-  day = day.padStart(2, '0');
+    // Convert yy → yyyy
+    const fullYear = Number(year) >= 50 ? `19${year}` : `20${year}`;
 
-  // Convert yy → yyyy
-  const fullYear = Number(year) >= 50 ? `19${year}` : `20${year}`;
+    return `${month}/${day}/${fullYear}`;
+  }
 
-  return `${month}/${day}/${fullYear}`;
+  if (matchLongFormat) {
+    let [, year, month, day] = matchLongFormat;
+
+    month = month.padStart(2, '0');
+    day = day.padStart(2, '0');
+
+    return `${month}/${day}/${year}`;
+  }
+  return '';
 }

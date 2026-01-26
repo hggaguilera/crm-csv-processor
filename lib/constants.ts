@@ -1,4 +1,6 @@
 export const BACKGROUND_FIELDS: { key: string; label: string }[] = [
+  { key: 'Texts', label: 'Texts' },
+  { key: 'Calls', label: 'Calls' },
   { key: 'Background', label: 'Background' },
   { key: 'Property Address', label: 'Property Address' },
   { key: 'Property City', label: 'Property City' },
