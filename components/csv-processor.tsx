@@ -21,20 +21,15 @@ import {
 } from 'lucide-react';
 
 // utils
-import { stageToStatusMap, formatShortUSDate } from '@/lib/utils';
 import {
-  BACKGROUND_FIELDS,
-  WEBSITE_FIELDS,
-  EMAIL_FIELDS,
-} from '@/lib/constants';
+  stageToStatusMap,
+  formatShortUSDate,
+  buildRelationshipContacts,
+  getRelationshipIndexes,
+} from '@/lib/utils';
+import { BACKGROUND_FIELDS } from '@/lib/constants';
+import { InputRow, OutputRow } from '@/lib/types';
 
-interface InputRow {
-  [key: string]: string;
-}
-
-interface OutputRow {
-  [key: string]: string;
-}
 
 /**
  * Transform function that maps input rows to output rows.
@@ -53,21 +48,25 @@ function transformRow(row: InputRow, headers: string[]): OutputRow[] {
 
   const mainContact: OutputRow = {};
 
-  if ('Name' in row) {
-    mainContact['Full Name'] = (row['Name'] || '').trim();
-  }
-
   if ('First Name' in row || 'Last Name' in row) {
     mainContact['First Name'] = (row['First Name'] || '').trim();
     mainContact['Last Name'] = (row['Last Name'] || '').trim();
   }
 
-  if ('Stage' in row) {
-    mainContact['Status'] = stageToStatusMap((row['Stage'] || '').trim());
+  if ('Name' in row) {
+    mainContact['Full Name'] = (row['Name'] || '').trim();
   }
 
   if ('Phone 1' in row) {
     mainContact['Phone'] = (row['Phone 1'] || '').trim();
+  }
+
+  if ('Email 1' in row) {
+    mainContact['Email'] = (row['Email 1'] || '').trim();
+  }
+
+  if ('Stage' in row) {
+    mainContact['Status'] = stageToStatusMap((row['Stage'] || '').trim());
   }
 
   if ('Tags' in row) {
@@ -141,10 +140,6 @@ function transformRow(row: InputRow, headers: string[]): OutputRow[] {
     mainContact['Website'] = (row['Website'] || '').trim();
   }
 
-  if ('Email 1' in row) {
-    mainContact['Email'] = (row['Email 1'] || '').trim();
-  }
-
   // Background fields concatenation
   const backgroundLines: string[] = [];
 
@@ -162,38 +157,12 @@ function transformRow(row: InputRow, headers: string[]): OutputRow[] {
 
   results.push(mainContact);
 
-  const relationshipFirstName = (row['Relationship 1 First Name'] || '').trim();
-  const relationshipLastName = (row['Relationship 1 Last Name'] || '').trim();
-  const relationshipEmail = (row['Relationship 1 Email 1'] || '').trim();
-  const relationshipPhone = (row['Relationship 1 Phone 1'] || '').trim();
+  const relationshipIndexes = getRelationshipIndexes(headers);
 
-  const hasRelationship =
-    relationshipFirstName ||
-    relationshipLastName ||
-    relationshipEmail ||
-    relationshipPhone;
+  for (const idx of relationshipIndexes) {
+    const relationshipContact = buildRelationshipContacts(row, idx);
 
-  if (hasRelationship) {
-    const relationshipContact: OutputRow = {};
-
-    if (relationshipFirstName)
-      relationshipContact['First Name'] = relationshipFirstName;
-    if (relationshipLastName)
-      relationshipContact['Last Name'] = relationshipLastName;
-
-    if (relationshipFirstName || relationshipLastName) {
-      relationshipContact['Full Name'] = [
-        relationshipFirstName,
-        relationshipLastName,
-      ]
-        .filter(Boolean)
-        .join(' ');
-    }
-
-    if (relationshipEmail) relationshipContact['Email'] = relationshipEmail;
-    if (relationshipPhone) relationshipContact['Phone'] = relationshipPhone;
-
-    results.push(relationshipContact);
+    if (relationshipContact) results.push(relationshipContact);
   }
 
   return results;
@@ -266,9 +235,6 @@ export function CsvProcessor() {
     }
 
     const transformed = parsedData.flatMap((row) => transformRow(row, headers));
-    // const transformed = parsedData
-    //   .map((row) => transformRow(row, headers))
-    //   .filter((row): row is OutputRow => row !== null);
 
     setProcessedData(transformed);
     setIsProcessed(true);
@@ -287,6 +253,7 @@ export function CsvProcessor() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+    clearFile();
   };
 
   const clearFile = () => {

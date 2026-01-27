@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { InputRow, OutputRow } from './types';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -59,4 +60,43 @@ export function formatShortUSDate(value: string): string {
     return `${month}/${day}/${year}`;
   }
   return '';
+}
+
+export function getRelationshipIndexes(headers: string[]): number[] {
+  const indexes = new Set<number>();
+
+  headers.forEach((h) => {
+    const match = h.match(/^Relationship (\d+)\s+/);
+    if (match) {
+      indexes.add(Number(match[1]));
+    }
+  });
+
+  return Array.from(indexes).sort((a, b) => a - b);
+}
+
+export function buildRelationshipContacts(
+  row: InputRow,
+  index: number,
+): OutputRow | null {
+  const prefix = `Relationship ${index}`;
+
+  const first = (row[`${prefix} First Name`] || '').trim();
+  const last = (row[`${prefix} Last Name`] || '').trim();
+  const email = (row[`${prefix} Email 1`] || '').trim();
+  const phone = (row[`${prefix} Phone 1`] || '').trim();
+
+  if (!first && !last && !email && !phone) return null;
+
+  const contact: OutputRow = {};
+
+  if (first) contact['First Name'] = first;
+  if (last) contact['Last Name'] = last;
+  if (first || last) {
+    contact['Full Name'] = [first, last].filter(Boolean).join(' ');
+  }
+  if (phone) contact['Phone'] = phone;
+  if (email) contact['Email'] = email;
+
+  return contact;
 }
