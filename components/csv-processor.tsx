@@ -26,6 +26,7 @@ import {
   formatShortUSDate,
   buildRelationshipContacts,
   getRelationshipIndexes,
+  normalizeEncoding,
 } from '@/lib/utils';
 import { BACKGROUND_FIELDS } from '@/lib/constants';
 import { InputRow, OutputRow } from '@/lib/types';
@@ -234,7 +235,10 @@ export function CsvProcessor() {
       return;
     }
 
-    const transformed = parsedData.flatMap((row) => transformRow(row, headers));
+    const transformed = parsedData.flatMap((row) => {
+      const transformedRow = normalizeEncoding(row);
+      return transformRow(transformedRow, headers);
+    });
 
     setProcessedData(transformed);
     setIsProcessed(true);

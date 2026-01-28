@@ -100,3 +100,23 @@ export function buildRelationshipContacts(
 
   return contact;
 }
+
+export function normalizeEncoding(row: InputRow): InputRow {
+  const normalizedRow: InputRow = {};
+
+  for (const key in row) {
+    const normalizedValue = row[key]
+      .normalize('NFC')
+      .replace(/‚Äôs/g, '’s')
+      .replace(/‚Äô/g, '’')
+      .replace(/‚Ä“/g, '“')
+      .replace(/‚Ä�/g, '”')
+      .replace(/â€”/g, '—')
+      .replace(/â€“/g, '–')
+      .replace(/â€¦/g, '…');
+
+    normalizedRow[key] = normalizedValue;
+  }
+
+  return normalizedRow;
+}
