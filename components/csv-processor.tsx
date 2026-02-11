@@ -22,7 +22,6 @@ import {
 
 // utils
 import {
-  stageToStatusMap,
   formatShortUSDate,
   buildRelationshipContacts,
   getRelationshipIndexes,
@@ -67,7 +66,7 @@ function transformRow(row: InputRow, headers: string[]): OutputRow[] {
   }
 
   if ('Stage' in row) {
-    mainContact['Status'] = stageToStatusMap((row['Stage'] || '').trim());
+    mainContact['Status'] = (row['Stage'] || '').trim();
   }
 
   if ('Tags' in row) {
