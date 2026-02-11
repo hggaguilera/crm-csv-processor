@@ -98,6 +98,8 @@ export function buildRelationshipContacts(
   if (phone) contact['Phone'] = phone;
   if (email) contact['Email'] = email;
 
+  contact['Status'] = 'Relationship';
+
   return contact;
 }
 
